@@ -1,31 +1,34 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const CalendarSchema =   new Schema( {
+const CalendarSchema = new Schema(
+  {
     title: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     resource: {
-        type: String
+      type: String,
     },
     description: {
-        type: String
+      type: String,
     },
     start: {
-        type: Date,
+      type: Date,
     },
     end: {
-        type: Date
+      type: Date,
     },
     allDay: {
-        type: Boolean
+      type: Boolean,
     },
     day: {
-        type: Date,
-        default: Date.now
-    }
-}, { timestamps: true })
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("calendar", CalendarSchema);
+module.exports = mongoose.model("calendar", CalendarSchema);

@@ -1,12 +1,14 @@
-import express from 'express';
-import SBAModel from '../models/SBAModel.js';
-import StudentModel from '../models/StudentModel.js';
-//import db from '../config/mongodb.js'
-import { role } from '../middlewares/variables.js';
+const express = require('express');
+const SBAModel = require('../models/SBAModel');
+const StudentModel = require('../models/StudentModel');
+const { role } = require('../middlewares/variables');
+
 const route = express.Router();
 
 route.get('/', async (req, res) => {
-  const data = await SBAModel.find();
+  const data = await SBAModel.find().sort({
+    createdAt: 'desc',
+  });
   res.json(data);
 });
 
@@ -92,6 +94,11 @@ route.get('/:class/:year/:term', async (req, res) => {
 
 //get class course
 route.get('/:class/:course/:year/:term', async (req, res) => {
+  let students = await StudentModel.find({
+    classID: req.params.class,
+    role: role.Student,
+  });
+
   let isExist = await SBAModel.findOne({
     class: req.params.class,
     course: req.params.course,
@@ -100,13 +107,30 @@ route.get('/:class/:course/:year/:term', async (req, res) => {
   });
 
   if (isExist) {
-    return res.json({ docs: isExist });
+    let oldStudents = isExist.students;
+    let docs = {
+      _id: isExist._id,
+      academicYear: isExist.academicYear,
+      class: isExist.class,
+      classWork: isExist.classWork,
+      course: isExist.course,
+      createdAt: isExist.createdAt,
+      exam: isExist.exam,
+      students: students.map(e => {
+        let selected = oldStudents.find(i => i.userID === e.userID);
+
+        return {
+          name: e.name + '  ' + e.surname,
+          userID: e.userID,
+          position: selected.position || '',
+          exam: selected.exam || '',
+          classWork: selected.classWork || '',
+        };
+      }),
+    };
+    return res.json({ docs });
   }
 
-  let students = await StudentModel.find({
-    classID: req.params.class,
-    role: role.Student,
-  });
   SBAModel.create({
     class: req.params.class,
     course: req.params.course,
@@ -116,9 +140,9 @@ route.get('/:class/:course/:year/:term', async (req, res) => {
       return {
         name: e.name + '  ' + e.surname,
         userID: e.userID,
-        position: '-',
-        exam: '',
-        classWork: { a1: 0, a2: 0, a3: 0, a4: 0 },
+        position: ' ',
+        exam: ' ',
+        classWork: '',
       };
     }),
   })
@@ -130,7 +154,7 @@ route.get('/:class/:course/:year/:term', async (req, res) => {
     })
     .catch(err => {
       console.log(err);
-      res.json({ success: false, error: 'Edit failed' });
+      res.json({ success: false, error: 'Failed' });
     });
 });
 
@@ -150,17 +174,19 @@ route.post('/create', async (req, res) => {
 
 //update student marks
 route.put('/update/student/:id/:studentID', async (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).send('Missing URL parameter: username');
-  }
+  console.log(req.params.studentID);
   const isExist = await SBAModel.findOne({
-    'students._id': req.params.studentID,
+    _id: req.params.id,
   });
-  console.log(isExist);
-  //console.log(req.params.studentID);
+
+  if (!isExist) {
+    return res.json({ error: 'SBA not found' });
+  }
+
   SBAModel.findOneAndUpdate(
     {
-      'students._id': req.params.studentID,
+      'students.userID': req.params.studentID,
+      _id: req.params.id,
     },
     { $set: { 'students.$': req.body } },
     {
@@ -169,9 +195,17 @@ route.put('/update/student/:id/:studentID', async (req, res) => {
   )
     .then(doc => {
       if (!doc) {
-        return res.json({ success: false, error: 'does not exists' });
+        SBAModel.findOneAndUpdate(
+          { _id: req.params.id },
+          { $push: { students: req.body } },
+          { new: true }
+        ).then(doc => {
+          console.log(doc);
+          return res.json({ success: true, doc });
+        });
+      } else {
+        return res.json({ success: true, doc });
       }
-      return res.json({ success: true, doc });
     })
     .catch(err => {
       console.log(err);
@@ -222,4 +256,4 @@ route.delete('/delete/:id', (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

@@ -1,19 +1,24 @@
-import express from 'express';
-import StudentModel from '../models/StudentModel.js';
-import CourseModel from '../models/CoursesModel.js';
-import bcrypt from 'bcrypt';
-import { login, changePassword } from '../middlewares/validate.js';
-import { stringtoLowerCaseSpace } from '../middlewares/utils.js';
-import { role } from '../middlewares/variables.js';
-import ClassesModel from '../models/ClassesModel.js';
-import TransactionsModel from '../models/TransactionsModel.js';
+const express = require('express');
+const StudentModel = require('../models/StudentModel');
+const CourseModel = require('../models/CoursesModel');
+const bcrypt = require('bcrypt');
+const { login, changePassword } = require('../middlewares/validate');
+const { stringtoLowerCaseSpace } = require('../middlewares/utils');
+const { role } = require('../middlewares/variables');
+const ClassesModel = require('../models/ClassesModel');
+const TransactionsModel = require('../models/TransactionsModel');
 
 const route = express.Router();
 
 //get all students
 route.get('/', async (req, res) => {
-  const data = await StudentModel.find({ role: role.Student });
-  let docs = data.filter(e => e.withdraw !== true);
+  const data = await StudentModel.find({
+    role: role.Student,
+    'past.status': false,
+  }).sort({
+    createdAt: 'desc',
+  });
+  let docs = data.filter(e => e.withdraw === false);
   res.json(docs);
 });
 
@@ -29,31 +34,11 @@ route.get('/withdraw', async (req, res) => {
 route.get('/past', async (req, res) => {
   const data = await StudentModel.find({
     role: role.Student,
+    'past.status': true,
   });
 
-  let isExist = async id => {
-    let result = await ClassesModel.findOne({ classCode: id });
-    console.log(id);
-    return result;
-  };
-
-  let allData = data.map(user => {
-    return {
-      role: user.role,
-      withdraw: user.withdraw,
-      name: user.name,
-      userID: user.userID,
-      middleName: user.middleName,
-      gender: user.gender,
-      profileUrl: user.profileUrl,
-      status: user.status,
-      classID: user.classID,
-      exists: isExist(user.classID) ? true : false,
-    };
-  });
-
-  let pastStudents = allData.filter(e => e.exists === false);
-  res.json(pastStudents);
+  //let pastStudents = data.filter((e) => e.exists === false);
+  res.json(data);
 });
 
 //unpaid fees
@@ -62,30 +47,32 @@ route.get('/unpaidfees', async (req, res) => {
     category: { $regex: 'fees' },
     type: 'income',
   });
-
+  console.log(docs);
   let data = docs.map(e => {
     return {
       amount: e.amount,
       userID: e.fees.userID,
       bank: e.bank,
       type: e.type,
-      academicYear: e.fees.academicYear,
+      year: e.fees.academicYear,
       term: e.fees.term,
       _id: e._id,
     };
   });
   const students = await StudentModel.find({ role: role.Student });
+  // let enrolledStudents = students.filter((e) => e.withdraw !== true);
   let results = students.map(e => {
     let fees = data.find(i => i.userID === e.userID);
     return {
       userID: e.userID,
+      campus: e.campus,
       name: e.name + ' ' + e.surname,
-      classID: e && e.classID,
-      amount: (e && fees.amount) || 0,
-      academicYear: (e && fees.academicYear) || null,
-      term: (e && fees.term) || null,
-      status: e && e.status,
-      fees: e && e.fees,
+      classID: e.classID,
+      amount: fees.amount || 0,
+      academicYear: fees.year || null,
+      term: fees.term || null,
+      status: e.status,
+      fees: e.fees,
     };
   });
 
@@ -155,9 +142,6 @@ route.get('/student/courses/:id', async (req, res) => {
 
 //get category num
 route.get('/number/:category/:value', async (req, res) => {
-  // if (!req.params.id) {
-  //   return res.status(400).send("Missing URL parameter: username");
-  // }
   await StudentModel.find({
     role: role.Student,
     [req.params.category]: req.params.value,
@@ -293,6 +277,26 @@ route.get('/class/:id', async (req, res) => {
   await StudentModel.find({ classID: req.params.id, role: role.Student })
     .then(user => {
       if (user.length > 0) {
+        let enrolledStudents = user.filter(e => e.withdraw !== true);
+        return res.json({ success: true, users: enrolledStudents });
+      } else {
+        return res.json({ success: false, error: 'No Students in this class' });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      return res.json({ success: false, error: 'Server error' });
+    });
+});
+
+//student class
+route.get('/student/class/:id/:userID', async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send('Missing URL parameter: username');
+  }
+  await StudentModel.find({ userID: req.params.userID, classID: req.params.id })
+    .then(user => {
+      if (user.length > 0) {
         return res.json({ success: true, users: user });
       } else {
         return res.json({ success: false, error: 'No Students in this class' });
@@ -313,7 +317,6 @@ route.post('/create', async (req, res) => {
   const studentExist = await StudentModel.findOne({
     $and: [
       {
-        email: body.email,
         name: body.name,
         surname: body.surname,
         role: role.Student,
@@ -322,6 +325,23 @@ route.post('/create', async (req, res) => {
   });
   if (studentExist) {
     return res.json({ success: false, error: 'Student already exist' });
+  }
+
+  const teacherExist = await StudentModel.findOne({
+    email: body.email,
+  });
+  if (teacherExist) {
+    return res.json({ success: false, error: 'Email already exists' });
+  }
+
+  const teachertelephoneExist = await StudentModel.findOne({
+    telephone: body.telephone,
+  });
+  if (teachertelephoneExist) {
+    return res.json({
+      success: false,
+      error: 'Telephone number  already exists',
+    });
   }
 
   //calculate student num
@@ -434,9 +454,29 @@ route.put('/changePassword/:id', async (req, res) => {
 //update info
 //address, nextof kin , classes, courses
 //change password
-route.put('/update/:id', (req, res) => {
+route.put('/update/:id', async (req, res) => {
   if (!req.params.id) {
     return res.status(400).send('Missing URL parameter: username');
+  }
+  let body = req.body;
+  const teacherExist = await StudentModel.findOne({
+    email: body.email,
+  });
+  if (teacherExist && teacherExist.userID !== req.params.id) {
+    return res.json({
+      success: false,
+      error: 'Email already used by another account',
+    });
+  }
+
+  const teachertelephoneExist = await StudentModel.findOne({
+    telephone: body.telephone,
+  });
+  if (teachertelephoneExist && teachertelephoneExist.userID !== req.params.id) {
+    return res.json({
+      success: false,
+      error: 'Telephone number is already used by another account',
+    });
   }
   StudentModel.findOneAndUpdate(
     {
@@ -460,23 +500,46 @@ route.put('/update/:id', (req, res) => {
 
 //change students class
 route.post('/upgrade/class', (req, res) => {
-  const { currentlass, nextclass } = req.body;
-
+  const { currentclass, nextclass } = req.body;
   StudentModel.updateMany(
     {
       role: role.Student,
-      classID: currentlass,
+      classID: currentclass,
     },
-    { classID: nextclass },
-    {
-      new: true,
-    }
+    { classID: nextclass }
   )
     .then(doc => {
       if (!doc) {
         return res.json({ success: false, error: 'doex not exists' });
       }
+
       return res.json({ success: true, student: doc });
+    })
+    .catch(err => {
+      res.json({ success: false, error: err });
+    });
+});
+
+//promote graduate  students
+route.post('/upgrade/graduate', (req, res) => {
+  const { currentclass } = req.body;
+
+  StudentModel.updateMany(
+    {
+      role: role.Student,
+      classID: currentclass,
+    },
+    { past: { status: true } }
+  )
+    .then(async doc => {
+      if (!doc) {
+        return res.json({ success: false, error: 'does not exists' });
+      }
+      await ClassesModel.findOneAndUpdate(
+        { classCode: currentclass },
+        { past: true }
+      );
+      return res.json({ success: true, docs: doc });
     })
     .catch(err => {
       res.json({ success: false, error: err });
@@ -499,7 +562,7 @@ route.post('/upgrade/dormitories', (req, res) => {
   )
     .then(doc => {
       if (!doc) {
-        return res.json({ success: false, error: 'doex not exists' });
+        return res.json({ success: false, error: 'class does not exists' });
       }
       return res.json({ success: true, student: doc });
     })
@@ -554,4 +617,5 @@ route.delete('/delele/:id', (req, res) => {
       res.status(500).json(err);
     });
 });
-export default route;
+
+module.exports = route;

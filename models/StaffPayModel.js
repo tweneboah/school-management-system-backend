@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -36,4 +36,4 @@ const BankingSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("staffpay", BankingSchema);
+module.exports = mongoose.model("staffpay", BankingSchema);

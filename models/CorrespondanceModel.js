@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -30,4 +30,4 @@ const CorrespondanceSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("correspondance", CorrespondanceSchema);
+module.exports = mongoose.model("correspondance", CorrespondanceSchema);

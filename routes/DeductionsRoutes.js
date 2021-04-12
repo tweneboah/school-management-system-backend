@@ -1,11 +1,13 @@
-import express from "express";
-import DeductionsModel from "../models/DeductionsModel.js";
+const express = require("express");
+const DeductionsModel = require("../models/DeductionsModel");
 
 const route = express.Router();
 
 //get all events
 route.get("/", async (req, res) => {
-  const docs = await DeductionsModel.find();
+  const docs = await DeductionsModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -86,4 +88,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

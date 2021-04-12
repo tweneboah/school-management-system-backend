@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -40,8 +40,12 @@ const ClassesSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    past: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("classes", ClassesSchema);
+module.exports = mongoose.model("classes", ClassesSchema);

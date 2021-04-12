@@ -1,10 +1,12 @@
-import express from "express";
-import DepartmentsModel from "../models/DepartmentsModel.js";
-import { stringtoLowerCase } from "../middlewares/utils.js";
+const express = require("express");
+const DepartmentsModel = require("../models/DepartmentsModel");
+const { stringtoLowerCase } = require("../middlewares/utils");
 const route = express.Router();
 
 route.get("/", async (req, res) => {
-  const data = await DepartmentsModel.find();
+  const data = await DepartmentsModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(data);
 });
 
@@ -62,7 +64,7 @@ route.put("/update/:id", (req, res) => {
 });
 
 //delete
-route.delete("/delete/id", (req, res) => {
+route.delete("/delete/:id", (req, res) => {
   if (!req.params.id) {
     return res.status(400).send("Missing URL parameter: username");
   }
@@ -77,20 +79,4 @@ route.delete("/delete/id", (req, res) => {
     });
 });
 
-//delete
-route.post("/delete/id", (req, res) => {
-  if (!req.params.id) {
-    return res.status(400).send("Missing URL parameter: username");
-  }
-  DepartmentsModel.findOneAndRemove({
-    _id: req.params.id,
-  })
-    .then((doc) => {
-      res.json(doc);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-export default route;
+module.exports = route;

@@ -1,12 +1,14 @@
-import express from 'express';
-import AttendanceModel from '../models/AttendenceModel.js';
-import { startAttendance } from '../middlewares/validate.js';
+const express = require('express');
+const AttendanceModel = require('../models/AttendenceModel');
+const { startAttendance } = require('../middlewares/validate');
 
 const route = express.Router();
 
 //get attendance
 route.get('/', async (req, res) => {
-  const docs = await AttendanceModel.find();
+  const docs = await AttendanceModel.find().sort({
+    createdAt: 'desc',
+  });
   res.json(docs);
 });
 
@@ -157,4 +159,4 @@ route.put('/update/:id', async (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

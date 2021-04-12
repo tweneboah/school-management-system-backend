@@ -1,27 +1,30 @@
-import express from "express";
-import ClassesModel from "../models/ClassesModel.js";
-import { stringtoLowerCaseSpace } from "../middlewares/utils.js";
-import StudentModel from "../models/StudentModel.js";
-import { role } from "../middlewares/variables.js";
-//import {createClass} from '../middlewares/validate.js'
+const express = require("express");
+const ClassesModel = require("../models/ClassesModel");
+const { stringtoLowerCaseSpace } = require("../middlewares/utils");
+const StudentModel = require("../models/StudentModel");
+const { role } = require("../middlewares/variables");
 const route = express.Router();
 
 route.get("/", async (req, res) => {
-  const docs = await ClassesModel.find();
-
-  let getStudents = async (id) => {
-    let num = await StudentModel.countDocuments({
-      role: role.Student,
-      classID: id,
-    });
-
-    return num;
-  };
-  // const students = await StudentModel.countDocuments({ role: role.Student });
+  const docs = await ClassesModel.find().sort({
+    createdAt: "desc",
+  });
   let classData = docs.map((e) => {
     return e;
   });
-  res.json(classData);
+  let data = classData.filter((e) => e.past !== true);
+  res.json(data);
+});
+
+route.get("/past", async (req, res) => {
+  const docs = await ClassesModel.find().sort({
+    createdAt: "desc",
+  });
+  let classData = docs.map((e) => {
+    return e;
+  });
+  let data = classData.filter((e) => e.past === true);
+  res.json(data);
 });
 
 //get one by id
@@ -42,12 +45,48 @@ route.get("/:id", async (req, res) => {
     });
 });
 
+//teacher ID
+route.get("/teacher/:id", async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send("Missing URL parameter: username");
+  }
+  await ClassesModel.find({ teacherID: req.params.id })
+    .then((docs) => {
+      if (docs) {
+        return res.json({ success: true, docs });
+      } else {
+        return res.json({ success: false, error: "Does not exists" });
+      }
+    })
+    .catch((err) => {
+      return res.json({ success: false, error: "Server error" });
+    });
+});
+
 //get by classCode
 route.get("/classCode/:id", async (req, res) => {
   if (!req.params.id) {
     return res.status(400).send("Missing URL parameter: username");
   }
   await ClassesModel.findOne({ classCode: req.params.id })
+    .then((docs) => {
+      if (docs) {
+        return res.json({ success: true, docs });
+      } else {
+        return res.json({ success: false, error: "Does not exists" });
+      }
+    })
+    .catch((err) => {
+      return res.json({ success: false, error: "Server error" });
+    });
+});
+
+//get by class name
+route.get("/name/:id", async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send("Missing URL parameter: username");
+  }
+  await ClassesModel.findOne({ name: req.params.id })
     .then((docs) => {
       if (docs) {
         return res.json({ success: true, docs });
@@ -134,4 +173,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

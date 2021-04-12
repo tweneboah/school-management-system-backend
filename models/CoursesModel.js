@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -20,7 +20,13 @@ const CourserSchema = new Schema(
       type: String,
     },
     classes: {
-      type: Array,
+      type: [
+        {
+          teacher: String,
+          class: String,
+          _id: String,
+        },
+      ],
     },
     department: {
       type: String,
@@ -36,4 +42,4 @@ const CourserSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("courses", CourserSchema);
+module.exports = mongoose.model("courses", CourserSchema);

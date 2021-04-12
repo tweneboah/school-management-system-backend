@@ -1,11 +1,13 @@
-import express from "express";
-import StoreSale from "../models/StoreSalesModel.js";
+const express = require("express");
+const StoreSale = require("../models/StoreSalesModel");
 
 const route = express.Router();
 
 //get all events
 route.get("/", async (req, res) => {
-  const docs = await StoreSale.find();
+  const docs = await StoreSale.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -87,4 +89,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

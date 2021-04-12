@@ -1,13 +1,15 @@
-import express from "express";
-import PrefectsModel from "../models/PrefectsModel.js";
-import StudentModel from "../models/StudentModel.js";
-import { role } from "../middlewares/variables.js";
+const express = require("express");
+const PrefectsModel = require("../models/PrefectsModel");
+const StudentModel = require("../models/StudentModel");
+const { role } = require("../middlewares/variables");
 const route = express.Router();
 
 //get all
 route.get("/", async (req, res) => {
   //const currentyear = new Date().getFullYear();
-  const data = await PrefectsModel.find({});
+  const data = await PrefectsModel.find({}).sort({
+    createdAt: "desc",
+  });
   //.where("endYear").gt(currentyear);
   res.json(data);
 });
@@ -129,4 +131,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

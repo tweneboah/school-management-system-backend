@@ -1,11 +1,13 @@
-import express from "express";
-import ActivityModel from "../models/ActivityLogs.js";
+const express = require("express");
+const ActivityModel = require("../models/ActivityLogs");
 
 const route = express.Router();
 
 //get all events
 route.get("/", async (req, res) => {
-  const docs = await ActivityModel.find();
+  const docs = await ActivityModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -86,4 +88,5 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+//export default route;
+module.exports = route;

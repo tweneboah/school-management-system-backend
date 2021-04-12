@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -9,7 +9,6 @@ const ChatSchema = new Schema(
     },
     message: {
       type: String,
-      required: true,
     },
     date: {
       type: Date,
@@ -18,8 +17,31 @@ const ChatSchema = new Schema(
     parent: {
       type: String,
     },
+    sender: {
+      type: String,
+    },
+    requestor_id: {
+      type: String,
+    },
+    acceptor_id: {
+      type: String,
+    },
+    messages: {
+      type: [
+        {
+          senderID: String,
+          message: String,
+          role: String,
+          date: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("chats", ChatSchema);
+module.exports = mongoose.model("chats", ChatSchema);

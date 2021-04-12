@@ -1,11 +1,13 @@
-import express from "express";
-import UsersModel from "../models/UsersModel.js";
+const express = require("express");
+const UsersModel = require("../models/UsersModel");
 
 const route = express.Router();
 
 //get all events
 route.get("/", async (req, res) => {
-  const docs = await UsersModel.find();
+  const docs = await UsersModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -87,4 +89,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

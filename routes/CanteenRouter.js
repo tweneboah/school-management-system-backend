@@ -1,12 +1,14 @@
-import express from "express";
-import CanteenModel from "../models/CanteenModel.js";
-import StudentModel from "../models/StudentModel.js";
+const express = require("express");
+const CanteenModel = require("../models/CanteenModel");
+const StudentModel = require("../models/StudentModel");
 
 const route = express.Router();
 
 //get all members
 route.get("/", async (req, res) => {
-  const docs = await CanteenModel.find();
+  const docs = await CanteenModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -82,6 +84,13 @@ route.post("/create", async (req, res) => {
   console.log(number);
 
   let memberID = "CA" + currentYear + (number + 1);
+
+  let checkMemberIDExist = await CanteenModel.findOne({ memberID: memberID });
+
+  if (checkMemberIDExist) {
+    memberID = memberID + 1;
+  }
+
   CanteenModel.create({ ...body, memberID })
     .then((doc) => {
       console.log(doc);
@@ -164,4 +173,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

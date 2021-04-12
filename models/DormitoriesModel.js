@@ -1,18 +1,21 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const DormitoriesSchema =   new Schema( {
+const DormitoriesSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     campus: {
-        type: String
+      type: String,
     },
     description: {
-        type: String
-    }
-}, { timestamps: true })
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("dormitories", DormitoriesSchema);
+module.exports = mongoose.model("dormitories", DormitoriesSchema);

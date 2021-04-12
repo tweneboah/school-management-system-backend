@@ -1,24 +1,27 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const PrefectsSchema =   new Schema( {
+const PrefectsSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     position: {
-        type: String
+      type: String,
     },
     userID: {
-        type: String
+      type: String,
     },
     startYear: {
-        type: String
+      type: String,
     },
     endYear: {
-        type: String
-    }
-}, { timestamps: true })
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("prefects", PrefectsSchema);
+module.exports = mongoose.model("prefects", PrefectsSchema);

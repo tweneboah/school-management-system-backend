@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -17,6 +17,10 @@ const TeacherSchema = new Schema(
     },
     middleName: {
       type: String,
+    },
+    isStaff: {
+      type: Boolean,
+      default: true,
     },
     lastLogin: {
       type: Date,
@@ -41,11 +45,18 @@ const TeacherSchema = new Schema(
       type: String,
       required: true,
     },
-    dateofBirth: {
+    dateOfBirth: {
       type: String,
     },
-    placeofBirth: {
+    placeOfBirth: {
       type: String,
+    },
+    campusID: {
+      type: String,
+    },
+    employmentDate: {
+      type: Date,
+      default: Date.now,
     },
     department: {
       type: String,
@@ -54,7 +65,10 @@ const TeacherSchema = new Schema(
       type: String,
       default: "teacher",
     },
-    qualifiations: {
+    qualifications: {
+      type: String,
+    },
+    years: {
       type: String,
     },
     bank: {
@@ -69,7 +83,7 @@ const TeacherSchema = new Schema(
     telephone: {
       type: String,
     },
-    mobile: {
+    mobilenumber: {
       type: String,
     },
     password: {
@@ -125,4 +139,4 @@ const TeacherSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("teachers", TeacherSchema, "accounts");
+module.exports = mongoose.model("teachers", TeacherSchema, "accounts");

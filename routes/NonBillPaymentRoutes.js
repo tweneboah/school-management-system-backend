@@ -1,11 +1,13 @@
-import express from "express";
-import NonBillPayment from "../models/NonBillModel.js";
+const express = require("express");
+const NonBillPayment = require("../models/NonBillModel");
 
 const route = express.Router();
 
 //get all events
 route.get("/", async (req, res) => {
-  const docs = await NonBillPayment.find();
+  const docs = await NonBillPayment.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -86,4 +88,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

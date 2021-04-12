@@ -1,30 +1,33 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const FilesSchema =   new Schema( {
-   topic: {
-       type: String
-   },
-   date: {
-       type: Date,
-       default: Date.now
-   },
-   notes: {
-       type: String
-   },
-   courseID: {
-       type: String
-   },
-   classID: {
-       type: String
-   },
-   senderID: {
-       type: String
-   },
-   file: {
-       type: String
-   }
-}, { timestamps: true })
+const FilesSchema = new Schema(
+  {
+    topic: {
+      type: String,
+    },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    notes: {
+      type: String,
+    },
+    courseID: {
+      type: String,
+    },
+    classID: {
+      type: String,
+    },
+    senderID: {
+      type: String,
+    },
+    file: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("notes", FilesSchema);
+module.exports = mongoose.model("notes", FilesSchema);

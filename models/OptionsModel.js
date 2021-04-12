@@ -1,19 +1,22 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const OptionsModel =   new Schema( {
+const OptionsModel = new Schema(
+  {
     events: {
       type: [
-            {
-                type: String
-            }
-         ]
+        {
+          type: String,
+        },
+      ],
     },
     date: {
-        type: Date, 
-        default: Date.now
-     },
-}, { timestamps: true })
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("optionsdata", OptionsModel);
+module.exports = mongoose.model("optionsdata", OptionsModel);

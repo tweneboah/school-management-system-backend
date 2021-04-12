@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -17,6 +17,12 @@ const SBASchema = new Schema(
     term: {
       type: String,
     },
+    exam: {
+      type: Number,
+    },
+    classWork: {
+      type: Number,
+    },
     students: {
       type: [
         {
@@ -24,7 +30,7 @@ const SBASchema = new Schema(
           name: String,
           position: String,
           exam: Number,
-          classWork: Object,
+          classWork: Number,
         },
       ],
     },
@@ -32,4 +38,4 @@ const SBASchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("sba", SBASchema);
+module.exports = mongoose.model("sba", SBASchema);

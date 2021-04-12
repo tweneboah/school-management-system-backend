@@ -1,8 +1,8 @@
-import express from "express";
-import SchoolModel from "../models/SchoolModel.js";
-import bcrypt from "bcrypt";
-import { login, changePassword } from "../middlewares/validate.js";
-import { role } from "../middlewares/variables.js";
+const express = require("express");
+const SchoolModel = require("../models/SchoolModel");
+const bcrypt = require("bcrypt");
+const { login, changePassword } = require("../middlewares/validate");
+const { role } = require("../middlewares/variables");
 
 const route = express.Router();
 
@@ -161,4 +161,4 @@ route.post("/change/password/:id", async (req, res) => {
   );
 });
 
-export default route;
+module.exports = route;

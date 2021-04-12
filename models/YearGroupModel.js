@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -17,4 +17,4 @@ const YearGroupSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("yeargroup", YearGroupSchema);
+module.exports = mongoose.model("yeargroup", YearGroupSchema);

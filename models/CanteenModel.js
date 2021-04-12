@@ -1,46 +1,47 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 const { Schema } = mongoose;
 
-const CanteenSchema = new Schema( {
+const CanteenSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     classID: {
-        type: String
+      type: String,
     },
     memberID: {
-        type: String
+      type: String,
     },
     userID: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     role: {
-        type: String
+      type: String,
     },
     paymentMethod: {
-        type: String
+      type: String,
     },
     payments: {
-        type: [
-            {
-                date: {
-                    type: Date,
-                    default: Date.now
-                },
-                receipt: String,
-                amount: String,
-                covers: {
-                    period: String
-                }
-            }
-        ]
+      type: [
+        {
+          date: {
+            type: Date,
+            default: Date.now,
+          },
+          receipt: String,
+          amount: String,
+          covers: String,
+        },
+      ],
     },
     date: {
-        type: Date,
-        default: Date.now
-    } 
-}, { timestamps: true })
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("canteen", CanteenSchema);
+module.exports = mongoose.model("canteen", CanteenSchema);

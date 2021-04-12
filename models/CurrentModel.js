@@ -1,26 +1,21 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const AcademicYearSchema =   new Schema( {
+const AcademicYearSchema = new Schema(
+  {
     currentYear: {
-        type: String,
-    },
-    years: {
-        type: Array
-    },
-    terms: {
-        type: Array
-    },
-    code: {
-        type: String
+      type: String,
     },
     currentTerm: {
-        type: String
+      type: String,
     },
-    description: {
-        type: String
-    }
-}, { timestamps: true })
+    code: {
+      type: String,
+      default: "admin",
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("academicYear", AcademicYearSchema);
+module.exports = mongoose.model("academicYear", AcademicYearSchema);

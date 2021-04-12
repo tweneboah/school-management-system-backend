@@ -1,12 +1,14 @@
-import express from "express";
-import PaymentPlanModel from "../models/PaymentPlanModel.js";
-import StudentModel from "../models/StudentModel.js";
-import { role } from "../middlewares/variables.js";
+const express = require("express");
+const PaymentPlanModel = require("../models/PaymentPlanModel");
+const StudentModel = require("../models/StudentModel");
+const { role } = require("../middlewares/variables");
 const route = express.Router();
 
 //get all
 route.get("/", async (req, res) => {
-  const data = await PaymentPlanModel.findOne({ dataID: "paymentPlan" });
+  const data = await PaymentPlanModel.findOne({ dataID: "paymentPlan" }).sort({
+    createdAt: "desc",
+  });
   res.json(data);
 });
 
@@ -21,10 +23,14 @@ route.put("/update/plans", async (req, res) => {
       new: true,
     }
   )
-    .then((doc) => {
-      console.log(doc);
+    .then(async (doc) => {
       if (!doc) {
-        return res.json({ success: false, error: "does not exists" });
+        let docs = await PaymentPlanModel.create({
+          dataID: "paymentPlan",
+          plans: req.body,
+        });
+        console.log(docs);
+        return res.json({ success: true, doc: docs });
       }
       return res.json({ success: true, doc });
     })
@@ -58,7 +64,6 @@ route.put("/update/services/:id", async (req, res) => {
     }
   )
     .then((doc) => {
-      console.log(doc);
       if (!doc) {
         return res.json({ success: false, error: "does not exists" });
       }
@@ -72,27 +77,18 @@ route.put("/update/services/:id", async (req, res) => {
 //add service
 route.post("/add/service", async (req, res) => {
   let body = req.body;
+  console.log(body);
   PaymentPlanModel.findOneAndUpdate(
     { dataID: "paymentPlan" },
     { $push: { services: body } },
     (err, success) => {
       if (err) {
-        console.log(err);
         res.json({ success: false, error: err });
       } else {
-        console.log(success);
         res.json({ success: true, doc: success });
       }
     }
   ).exec();
-  // .then((doc) => {
-  //   console.log(doc);
-  //   res.json({ success: true, doc });
-  // })
-  // .catch((err) => {
-  //   console.log(err);
-  //   res.json({ success: false, error: err });
-  // });
 });
 
 //edit task
@@ -112,7 +108,6 @@ route.put("/update/:id", async (req, res) => {
     .then((doc) => {
       console.log(doc);
       if (!doc) {
-        // return res.json({ success: false, error: "does not exists" });
         PaymentPlanModel.create({ ...req.body, dataID: "paymentPlan" })
           .then((docs) => {
             console.log(docs);
@@ -147,4 +142,4 @@ route.put("/delete/services/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

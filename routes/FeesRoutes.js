@@ -1,11 +1,13 @@
-import express from "express";
-import FeesModel from "../models/FeesModel.js";
-import { stringtoLowerCaseSpace } from "../middlewares/utils.js";
+const express = require("express");
+const FeesModel = require("../models/FeesModel");
+const { stringtoLowerCaseSpace } = require("../middlewares/utils");
 const route = express.Router();
 
 //get all fees
 route.get("/", async (req, res) => {
-  const docs = await FeesModel.find();
+  const docs = await FeesModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -98,6 +100,38 @@ route.post("/add", async (req, res) => {
   }
 });
 
+//update by name
+route.put("/update/name", async (req, res) => {
+  FeesModel.findOneAndUpdate(
+    {
+      name: req.body.name,
+    },
+    req.body,
+    {
+      new: true,
+    }
+  )
+    .then(() => {
+      return res.json({ success: true, message: "OK" });
+    })
+    .catch((err) => {
+      return res.json({ success: false, error: err });
+    });
+});
+
+//delete by name
+route.delete("/delete/name", async (req, res) => {
+  FeesModel.findOneAndDelete({
+    name: req.body.name,
+  })
+    .then(() => {
+      return res.json({ success: true, message: "OK" });
+    })
+    .catch((err) => {
+      return res.json({ success: false, error: err });
+    });
+});
+
 //update class fees
 route.put("/update/:id", async (req, res) => {
   FeesModel.findOneAndUpdate(
@@ -130,4 +164,4 @@ route.delete("/delete/:id", async (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

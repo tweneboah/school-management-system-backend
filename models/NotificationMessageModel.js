@@ -1,26 +1,28 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const NotificationsSchema = new Schema( {
-   date: {
-       type: Date,
-       default: Date.now
-   },
-   sender: {
-      type: String
-   },
-   isSend: {
-       type: Boolean,
-       default: false
-   },
-   messageID: {
-       type: String,
-   },
-   receiver: {
-       type: String
-   }
+const NotificationsSchema = new Schema(
+  {
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    sender: {
+      type: String,
+    },
+    isSend: {
+      type: Boolean,
+      default: false,
+    },
+    messageID: {
+      type: String,
+    },
+    receiver: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-}, { timestamps: true })
-
-export default  mongoose.model("newMessage", NotificationsSchema);
+module.exports = mongoose.model("newMessage", NotificationsSchema);

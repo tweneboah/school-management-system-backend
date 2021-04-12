@@ -1,17 +1,20 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const PayrowSchema =   new Schema( {
+const PayrowSchema = new Schema(
+  {
     type: {
-       type: String,
-       default: "pay"
+      type: String,
+      default: "pay",
     },
     name: String,
     code: String,
     salary: String,
     allowance: String,
     bonus: String,
-}, { timestamps: true })
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("payrow", PayrowSchema);
+module.exports = mongoose.model("payrow", PayrowSchema);

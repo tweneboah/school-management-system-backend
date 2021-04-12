@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -17,4 +17,4 @@ const DeductionsSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("deductions", DeductionsSchema);
+module.exports = mongoose.model("deductions", DeductionsSchema);

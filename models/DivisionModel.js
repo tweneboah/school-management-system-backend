@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -14,4 +14,4 @@ const DivisionSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("division", DivisionSchema);
+module.exports = mongoose.model("division", DivisionSchema);

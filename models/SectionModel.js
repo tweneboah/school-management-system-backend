@@ -1,15 +1,18 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const SectionSchema =   new Schema( {
+const SectionSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     description: {
-        type: String
-    }
-}, { timestamps: true })
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("sections", SectionSchema);
+module.exports = mongoose.model("sections", SectionSchema);

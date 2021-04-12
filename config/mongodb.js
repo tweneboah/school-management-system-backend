@@ -1,13 +1,13 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
 //LOCAL_DB_CONNECT  -localhost database
 //DB_CONNECT  -online database
 dotenv.config();
-const connection_url = process.env.DB_CONNECT;
+const connection_url = process.env.LOCAL_DB_CONNECT;
 
 mongoose.connect(
-  'mongodb+srv://inovotek:MYJmX4htfWqV1l37@cluster0.4ttt9.mongodb.net/demo-db?retryWrites=true&w=majority',
+  'mongodb+srv://sms:RVy6PD1V2ljiOCJS@school-management-syste.zeq56.mongodb.net/school-management-sys?retryWrites=true&w=majority',
   {
     useCreateIndex: true,
     useNewUrlParser: true,
@@ -23,4 +23,5 @@ mongoose.connection.once('open', () => {
   // })
 });
 
-export default mongoose;
+//export default mongoose;
+module.exports = mongoose;

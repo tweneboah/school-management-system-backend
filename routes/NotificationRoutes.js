@@ -1,10 +1,14 @@
-import express from "express";
-import NotificationsModal from "../models/NoticeModel.js";
+const express = require("express");
+const NotificationsModal = require("../models/NoticeModel");
 
 const route = express.Router();
 //get all
 route.get("/", async (req, res) => {
-  const data = await NotificationsModal.find({ date: { $gte: new Date() } });
+  const data = await NotificationsModal.find({
+    date: { $gte: new Date() },
+  }).sort({
+    createdAt: "desc",
+  });
   res.json(data);
 });
 
@@ -135,4 +139,4 @@ route.delete("/delete", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

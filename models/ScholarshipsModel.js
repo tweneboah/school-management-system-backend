@@ -1,18 +1,21 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const ScholarshipsSchema =   new Schema( {
+const ScholarshipsSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     percentage: {
-        type: String
+      type: String,
     },
     types: {
-        type: Object
-    }
-}, { timestamps: true })
+      type: Object,
+    },
+  },
+  { timestamps: true }
+);
 
-export default  mongoose.model("scholarships", ScholarshipsSchema);
+module.exports = mongoose.model("scholarships", ScholarshipsSchema);

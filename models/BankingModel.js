@@ -1,41 +1,48 @@
-import  mongoose from "../config/mongodb.js"
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
-const BankingSchema =   new Schema( {
+const BankingSchema = new Schema(
+  {
     bankName: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     accountNumber: {
-        type: String
+      type: String,
     },
     accountName: {
-        type: String
+      type: String,
     },
     transactions: {
-        type: [
-            {
-                date: {
-                    type: Date,
-                    default: Date.now
-                },
-                description: String,
-                payee: String,
-                transactionNumber: String,
-                credit: String,
-                debit: String,
-                bankAcc: String,
-                issuedDate: {
-                    type: Date
-                }
-            }
-        ]
+      type: Array,
+      // type: [
+      //   {
+      //     date: {
+      //       type: Date,
+      //       default: Date.now,
+      //     },
+      //     description: String,
+      //     payee: String,
+      //     transactionNumber: String,
+      //     credit: String,
+      //     debit: String,
+      //     type: String,
+      //     bankAcc: String,
+      //     issuedDate: {
+      //       type: Date,
+      //       default: Date.now,
+      //     },
+      // },
+      // ],
     },
     date: {
-        type: Date,
-        default: Date.now
-    }
-}, { timestamps: true })
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true },
+  { typeKey: "$type" }
+);
 
-export default  mongoose.model("banking", BankingSchema);
+module.exports = mongoose.model("banking", BankingSchema);

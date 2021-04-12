@@ -1,9 +1,11 @@
-import express from "express";
-import CorrespondanceModel from "../models/CorrespondanceModel.js";
+const express = require("express");
+const CorrespondanceModel = require("../models/CorrespondanceModel");
 const route = express.Router();
 
 route.get("/", async (req, res) => {
-  const docs = await CorrespondanceModel.find();
+  const docs = await CorrespondanceModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -82,4 +84,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

@@ -1,4 +1,4 @@
-import mongoose from "../config/mongodb.js";
+const mongoose = require("../config/mongodb");
 
 const { Schema } = mongoose;
 
@@ -35,4 +35,4 @@ const NonBillSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("nonbillpayment", NonBillSchema);
+module.exports = mongoose.model("nonbillpayment", NonBillSchema);

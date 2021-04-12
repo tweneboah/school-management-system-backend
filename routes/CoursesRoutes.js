@@ -1,11 +1,13 @@
-import express from 'express';
-import CoursesModel from '../models/CoursesModel.js';
-import { stringtoLowerCase } from '../middlewares/utils.js';
+const express = require('express');
+const CoursesModel = require('../models/CoursesModel');
+const { stringtoLowerCase } = require('../middlewares/utils');
 
 const route = express.Router();
 
 route.get('/', async (req, res) => {
-  const doc = await CoursesModel.find();
+  const doc = await CoursesModel.find().sort({
+    createdAt: 'desc',
+  });
   res.json(doc);
 });
 
@@ -21,6 +23,34 @@ route.get('/:id', async (req, res) => {
       } else {
         return res.json({ success: false, error: 'Does not exists' });
       }
+    })
+    .catch(err => {
+      return res.json({ success: false, error: 'Server error' });
+    });
+});
+
+//get class courses
+route.get('/class/:id', async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send('Missing URL parameter: username');
+  }
+  await CoursesModel.find({ 'classes.class': req.params.id })
+    .then(docs => {
+      return res.json({ success: true, docs });
+    })
+    .catch(err => {
+      return res.json({ success: false, error: 'Server error' });
+    });
+});
+
+//get teacher courses
+route.get('/teacher/:id', async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send('Missing URL parameter: username');
+  }
+  await CoursesModel.find({ 'classes.teacher': req.params.id })
+    .then(docs => {
+      return res.json({ success: true, docs });
     })
     .catch(err => {
       return res.json({ success: false, error: 'Server error' });
@@ -45,7 +75,23 @@ route.get('/courseCode/:id', async (req, res) => {
     });
 });
 
-//return course name
+//get by coursecode
+route.get('/headteacher/:id', async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send('Missing URL parameter: username');
+  }
+  await CoursesModel.find({ teacher: req.params.id })
+    .then(docs => {
+      if (docs) {
+        return res.json({ success: true, docs });
+      } else {
+        return res.json({ success: false, error: 'Does not exists' });
+      }
+    })
+    .catch(err => {
+      return res.json({ success: false, error: 'Server error' });
+    });
+});
 
 //search
 route.get('search/:teacher/:name/:campus', async (res, req) => {
@@ -62,8 +108,8 @@ route.post('/create', async (req, res) => {
   let body = req.body;
   body = {
     ...body,
-    code: stringtoLowerCase(body.name),
-    name: stringtoLowerCase(body.name),
+    code: stringtoLowerCase(body.code),
+    name: body.name,
   };
 
   const departExist = await CoursesModel.findOne({
@@ -127,4 +173,4 @@ route.delete('/delete/:id', (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

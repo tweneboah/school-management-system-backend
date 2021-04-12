@@ -1,10 +1,12 @@
-import express from "express";
-import DivisionModel from "../models/DivisionModel.js";
-import { stringtoLowerCase } from "../middlewares/utils.js";
+const express = require("express");
+const DivisionModel = require("../models/DivisionModel");
+const { stringtoLowerCase } = require("../middlewares/utils");
 const route = express.Router();
 
 route.get("/", async (req, res) => {
-  const data = await DivisionModel.find();
+  const data = await DivisionModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(data);
 });
 
@@ -74,4 +76,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

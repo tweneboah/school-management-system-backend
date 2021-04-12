@@ -1,11 +1,13 @@
-import express from "express";
-import OptionsModel from "../models/OptionsModel.js";
+const express = require("express");
+const OptionsModel = require("../models/OptionsModel");
 
 const route = express.Router();
 
 //get all events
 route.get("/", async (req, res) => {
-  const docs = await OptionsModel.find();
+  const docs = await OptionsModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -86,4 +88,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

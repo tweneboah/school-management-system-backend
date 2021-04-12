@@ -1,10 +1,12 @@
-import express from "express";
-import YearGroupModel from "../models/YearGroupModel.js";
-import { stringtoLowerCase } from "../middlewares/utils.js";
+const express = require("express");
+const YearGroupModel = require("../models/YearGroupModel");
+const { stringtoLowerCase } = require("../middlewares/utils");
 const route = express.Router();
 
 route.get("/", async (req, res) => {
-  const data = await YearGroupModel.find();
+  const data = await YearGroupModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(data);
 });
 
@@ -75,4 +77,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;

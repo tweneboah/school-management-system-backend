@@ -1,11 +1,13 @@
-import express from "express";
-import CalendarModel from "../models/CalenderModel.js";
+const express = require("express");
+const CalendarModel = require("../models/CalenderModel");
 
 const route = express.Router();
 
 //get all events
 route.get("/", async (req, res) => {
-  const docs = await CalendarModel.find();
+  const docs = await CalendarModel.find().sort({
+    createdAt: "desc",
+  });
   res.json(docs);
 });
 
@@ -101,4 +103,4 @@ route.delete("/delete/:id", (req, res) => {
     });
 });
 
-export default route;
+module.exports = route;
