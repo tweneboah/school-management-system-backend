@@ -61,7 +61,7 @@ app.use(express.static('./public'));
 
 //routes
 app.get('/', (req, res) => {
-  res.send('welcome to D-system api');
+  res.json({ app: 'School Management system API', developedBy: 'i-Novotek' });
 });
 
 app.use('/api/students', StudentRoutes);
