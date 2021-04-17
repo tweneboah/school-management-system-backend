@@ -54,8 +54,8 @@ const PORT = process.env.PORT || 5000;
 //middlewares
 app.use(cors());
 app.use(express.json());
-//app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: true, credentials: true }));
+app.use(express.urlencoded({ extended: true }));
+// app.use(cors({ origin: true, credentials: true }));
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/consumerPhotos'));
@@ -63,7 +63,10 @@ app.use(express.static('./public'));
 
 //routes
 app.get('/', (req, res) => {
-  res.json({ app: 'School Management system API', developedBy: 'i-Novotek' });
+  res.json({
+    app: 'School Management system API',
+    developedBy: 'i-Novotek...',
+  });
 });
 
 app.use('/api/students', StudentRoutes);
