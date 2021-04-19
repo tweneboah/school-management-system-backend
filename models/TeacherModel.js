@@ -111,7 +111,8 @@ const TeacherSchema = new Schema(
       type: String,
     },
     ssnit: {
-      type: String,
+      type: Boolean,
+      default: false,
     },
     taxNumber: {
       type: String,

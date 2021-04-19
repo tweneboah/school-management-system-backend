@@ -73,13 +73,6 @@ const StudentSchema = new Schema(
     classID: {
       type: String,
     },
-    courses: {
-      type: [
-        {
-          courseID: String,
-        },
-      ],
-    },
     guadian: {
       type: [
         {
@@ -145,6 +138,9 @@ const StudentSchema = new Schema(
     withdraw: {
       type: Boolean,
       default: false,
+    },
+    withdrawDate: {
+      type: Date,
     },
     date: {
       type: Date,

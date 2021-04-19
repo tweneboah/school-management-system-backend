@@ -24,6 +24,9 @@ const TransactionSchema = new Schema(
       type: String,
     },
     description: String,
+    month: String,
+    year: String,
+    term: String,
     pay: {
       type: {
         accountNumber: String,

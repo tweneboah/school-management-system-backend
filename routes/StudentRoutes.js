@@ -6,6 +6,7 @@ const { login, changePassword } = require('../middlewares/validate');
 const { stringtoLowerCaseSpace } = require('../middlewares/utils');
 const { role } = require('../middlewares/variables');
 const ClassesModel = require('../models/ClassesModel');
+const FeesModel = require('../models/FeesModel');
 const TransactionsModel = require('../models/TransactionsModel');
 
 const route = express.Router();
@@ -37,17 +38,20 @@ route.get('/past', async (req, res) => {
     'past.status': true,
   });
 
-  //let pastStudents = data.filter((e) => e.exists === false);
   res.json(data);
 });
 
 //unpaid fees
-route.get('/unpaidfees', async (req, res) => {
+route.get('/unpaidfees/:year/:term', async (req, res) => {
   const docs = await TransactionsModel.find({
     category: { $regex: 'fees' },
     type: 'income',
+    'fees.term': req.params.term,
+    'fees.academicYear': req.params.year,
   });
-  console.log(docs);
+
+  const feesData = await FeesModel.find();
+
   let data = docs.map(e => {
     return {
       amount: e.amount,
@@ -60,19 +64,29 @@ route.get('/unpaidfees', async (req, res) => {
     };
   });
   const students = await StudentModel.find({ role: role.Student });
-  // let enrolledStudents = students.filter((e) => e.withdraw !== true);
   let results = students.map(e => {
     let fees = data.find(i => i.userID === e.userID);
+    let thisfees = feesData.find(i => i.code === e.classID);
+
+    let type = thisfees && thisfees[e && e.status];
+    let bill;
+    if (type) {
+      bill = Object.values(type).reduce(
+        (t, value) => Number(t) + Number(value),
+        0
+      );
+    }
+
     return {
-      userID: e.userID,
-      campus: e.campus,
-      name: e.name + ' ' + e.surname,
-      classID: e.classID,
-      amount: fees.amount || 0,
-      academicYear: fees.year || null,
-      term: fees.term || null,
-      status: e.status,
-      fees: e.fees,
+      userID: e && e.userID,
+      campus: e && e.campus,
+      name: e && e.name + ' ' + e && e.surname,
+      classID: e && e.classID,
+      amount: (fees && fees.amount) || 0,
+      academicYear: req.params.year,
+      term: req.params.term,
+      status: e && e.status,
+      fees: bill,
     };
   });
 
@@ -451,6 +465,30 @@ route.put('/changePassword/:id', async (req, res) => {
   });
 });
 
+route.put('/readmit/:id', async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send('Missing URL parameter: username');
+  }
+  StudentModel.findOneAndUpdate(
+    {
+      userID: req.params.id,
+    },
+    { classID: req.body.classID, 'past.status': false },
+    {
+      new: true,
+    }
+  )
+    .then(doc => {
+      if (!doc) {
+        return res.json({ success: false, error: 'doex not exists' });
+      }
+      return res.json({ success: true, student: doc });
+    })
+    .catch(err => {
+      res.json({ success: false, error: err });
+    });
+});
+
 //update info
 //address, nextof kin , classes, courses
 //change password
@@ -529,7 +567,7 @@ route.post('/upgrade/graduate', (req, res) => {
       role: role.Student,
       classID: currentclass,
     },
-    { past: { status: true } }
+    { past: { status: true, year: new Date() } }
   )
     .then(async doc => {
       if (!doc) {
